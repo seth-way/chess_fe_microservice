@@ -1,4 +1,4 @@
-# Chess Microservice FE
+# Chess FE Micro-Service
 
 ### Abstract:
 [//]: <> (Briefly describe what you built and its features. What problem is the app solving? How does this application solve that problem?)
