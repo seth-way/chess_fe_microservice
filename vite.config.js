@@ -12,7 +12,7 @@ export default defineConfig({
       exposes: {
         './Board': './src/components/Board/Board.jsx',
       },
-      shared: ['react'],
+      shared: ['react', 'react-dom'],
     }),
   ],
   build: {
