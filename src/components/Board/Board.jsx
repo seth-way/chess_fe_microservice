@@ -1,7 +1,12 @@
 import './Board.css';
 
-const Board = () => {
-  return <div>Chess Board from FE Micro Service</div>;
+const Board = ({ msg }) => {
+  return (
+    <>
+      <div>Chess Board from FE Micro Service</div>
+      <p>{msg}</p>
+    </>
+  );
 };
 
 export default Board;
