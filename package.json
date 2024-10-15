@@ -11,8 +11,11 @@
     "cy:open": "cypress open"
   },
   "dependencies": {
+    "chess.js": "^0.12.1",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-chessboard": "^4.7.2",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.27.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.11.1",

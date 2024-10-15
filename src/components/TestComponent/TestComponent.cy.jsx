@@ -1,10 +1,9 @@
-import React from 'react';
-import Board from './Board';
+import TestComponent from './TestComponent';
 
-describe('<Board />', () => {
+describe('<TestComponent />', () => {
   it('renders', () => {
     // see: https://on.cypress.io/mounting-react
-    cy.mount(<Board />);
+    cy.mount(<TestComponent />);
     cy.get('div').should('contains.text', 'Chess Board from FE Micro Service');
   });
 });
