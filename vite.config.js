@@ -10,7 +10,8 @@ export default defineConfig({
       name: 'chess-components',
       filename: 'remoteEntry.js',
       exposes: {
-        './Board': './src/components/Board/Board.jsx',
+        './TestComponent': './src/components/TestComponent/TestComponent.jsx',
+        './Game': './src/components/Game/Game.jsx',
       },
       shared: ['react', 'react-dom'],
     }),
