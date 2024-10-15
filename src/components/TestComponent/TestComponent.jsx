@@ -1,12 +1,12 @@
-import './Board.css';
+import './TestComponent.css';
 
-const Board = ({ msg }) => {
+const TestComponent = ({ msg }) => {
   return (
     <>
-      <div>Chess Board from FE Micro Service</div>
+      <div>Test component from FE Micro Service</div>
       <p>{msg}</p>
     </>
   );
 };
 
-export default Board;
+export default TestComponent;
