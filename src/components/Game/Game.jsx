@@ -2,10 +2,12 @@ import './Game.css';
 import { useState } from 'react';
 import { Chess } from 'chess.js';
 import { Chessboard } from 'react-chessboard';
+import { sampleGameObject } from '../../../mock_data/dummyGame';
 
 const Game = () => {
   const [game, setGame] = useState(new Chess());
   const [playerColor, setPlayerColor] = useState('black')
+  const [gameJson, setGameJson] = useState(sampleGameObject)
 
   function makeAMove(move) {
     const gameCopy = { ...game };
