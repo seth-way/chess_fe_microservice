@@ -5,6 +5,7 @@ import { Chessboard } from 'react-chessboard';
 
 const Game = () => {
   const [game, setGame] = useState(new Chess());
+  const [playerColor, setPlayerColor] = useState('black')
 
   function makeAMove(move) {
     const gameCopy = { ...game };
@@ -35,7 +36,7 @@ const Game = () => {
     return true;
   }
 
-  return <Chessboard position={game.fen()} onPieceDrop={onDrop} />;
+  return <Chessboard position={game.fen()} onPieceDrop={onDrop} boardOrientation={playerColor} />;
 };
 
 export default Game;
