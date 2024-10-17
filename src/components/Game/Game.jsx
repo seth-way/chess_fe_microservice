@@ -5,7 +5,7 @@ import { Chessboard } from 'react-chessboard';
 import { sampleGameObject } from '../../../mock_data/dummyGame';
 
 const Game = () => {
-  const [game, setGame] = useState(new Chess());
+  const [game, setGame] = useState(initializeGame());
   const [playerColor, setPlayerColor] = useState('black')
   const [gameJson, setGameJson] = useState(sampleGameObject)
 
@@ -13,7 +13,13 @@ const Game = () => {
     const gameCopy = { ...game };
     const result = gameCopy.move(move);
     setGame(gameCopy);
+    console.log(game.fen())
     return result;
+  }
+
+  function initializeGame(){
+    const game = new Chess()
+    return(game)
   }
 
   function makeRandomMove() {
