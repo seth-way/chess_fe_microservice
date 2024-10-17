@@ -1,13 +1,14 @@
 import './Game.css';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Chess } from 'chess.js';
 import { Chessboard } from 'react-chessboard';
-import { sampleGameObject } from '../../../mock_data/dummyGame';
+import { sampleGameObject, samplePlayerID } from '../../../mock_data/dummyGame';
 
 const Game = () => {
-  const [playerColor, setPlayerColor] = useState('black')
+  const [playerColor, setPlayerColor] = useState('white')
   const [gameJson, setGameJson] = useState(sampleGameObject)
   const [game, setGame] = useState(initializeGame(gameJson));
+  const [playerId, setPlayerId] = useState(samplePlayerID)
 
   function makeAMove(move) {
     const gameCopy = { ...game };
@@ -16,6 +17,16 @@ const Game = () => {
     console.log(game.fen())
     return result;
   }
+
+  function rotateBoard(playerId, existingGame){
+    if(String(playerId) === existingGame.data.attributes.black_player_id){
+      setPlayerColor('black')
+    }
+  }
+
+  useEffect(()=>{
+    rotateBoard(playerId, gameJson)
+  },[])
 
   function initializeGame(existingGame){
     if (existingGame){
