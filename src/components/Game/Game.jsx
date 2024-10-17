@@ -5,9 +5,9 @@ import { Chessboard } from 'react-chessboard';
 import { sampleGameObject } from '../../../mock_data/dummyGame';
 
 const Game = () => {
-  const [game, setGame] = useState(initializeGame());
   const [playerColor, setPlayerColor] = useState('black')
   const [gameJson, setGameJson] = useState(sampleGameObject)
+  const [game, setGame] = useState(initializeGame(gameJson));
 
   function makeAMove(move) {
     const gameCopy = { ...game };
@@ -17,7 +17,11 @@ const Game = () => {
     return result;
   }
 
-  function initializeGame(){
+  function initializeGame(existingGame){
+    if (existingGame){
+      const game = new Chess(existingGame.data.attributes.current_fen)
+      return (game)
+    }
     const game = new Chess()
     return(game)
   }
