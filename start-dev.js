@@ -1,5 +1,10 @@
-require('dotenv').config();
-const { spawn } = require('child_process');
+// Import 'dotenv' to load environment variables
+import dotenv from 'dotenv';
+import { spawn } from 'child_process';
+
+// Load environment variables from .env file
+dotenv.config();
+
 console.log('run m s', process.env.RUN_MOCK_SERVER);
 
 // Check if the environment variable RUN_SERVER is set to true
