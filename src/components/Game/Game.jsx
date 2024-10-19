@@ -3,9 +3,12 @@ import { useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
 import { Chess } from 'chess.js';
 import { Chessboard } from 'react-chessboard';
+import { sampleGameObject } from '../../../mock_data/dummyGame';
 
-const Game = () => {
-	const [game, setGame] = useState(new Chess());
+const Game = ({gameId, playerId}) => {
+  const [playerColor, setPlayerColor] = useState('white')
+  const [gameJson, setGameJson] = useState(sampleGameObject)
+	const [game, setGame] = useState(initializeGame(gameJson));
 
 	useEffect(() => {
 		const socket = io('http://localhost:57921', {
@@ -20,6 +23,25 @@ const Game = () => {
 		setGame(gameCopy);
 		return result;
 	}
+
+  function rotateBoard(playerId, existingGame){
+    if(String(playerId) === existingGame.data.attributes.black_player_id){
+      setPlayerColor('black')
+    }
+  }
+
+  useEffect(()=>{
+    rotateBoard(playerId, gameJson)
+  },[])
+
+  function initializeGame(existingGame){
+    if (existingGame){
+      const game = new Chess(existingGame.data.attributes.current_fen)
+      return (game)
+    }
+    const game = new Chess()
+    return(game)
+  }
 
 	function makeRandomMove() {
 		const possibleMoves = game.moves();
@@ -42,7 +64,7 @@ const Game = () => {
 		return true;
 	}
 
-	return <Chessboard position={game.fen()} onPieceDrop={onDrop} />;
+  return <Chessboard position={game.fen()} onPieceDrop={onDrop} boardOrientation={playerColor} />;
 };
 
 export default Game;
