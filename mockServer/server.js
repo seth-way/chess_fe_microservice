@@ -8,7 +8,7 @@ import getPort from 'get-port';
 
   const io = new Server(port, {
     cors: {
-      origin: 'http://localhost:5173', // Replace with your Vite app's URL
+      origin: 'http://localhost:5173',
       methods: ['GET', 'POST'],
     },
   });
@@ -42,7 +42,7 @@ import getPort from 'get-port';
     console.log('Server shutting down...');
     io.close(() => {
       console.log('Server closed');
-      process.exit(0); // Ensure exit after shutdown
+      process.exit(0);
     });
   });
 })();
