@@ -1,70 +1,107 @@
 import './Game.css';
 import { useState, useEffect } from 'react';
-import { io } from 'socket.io-client';
 import { Chess } from 'chess.js';
 import { Chessboard } from 'react-chessboard';
-import { sampleGameObject } from '../../../mock_data/dummyGame';
+import ChessSocket from '../../lib/ChessSocket';
+import Loading from '../Loading/Loading';
+import LoadError from '../LoadError/LoadError';
 
-const Game = ({gameId, playerId}) => {
-  const [playerColor, setPlayerColor] = useState('white')
-  const [gameJson, setGameJson] = useState(sampleGameObject)
-	const [game, setGame] = useState(initializeGame(gameJson));
+const defaultGameData = {
+  playerColor: 'white',
+  turn: 'white',
+  whitePlayerId: '',
+  blackPlayerId: '',
+  currentFen: '',
+  previousFen: '',
+  complete: false,
+  draw: false,
+};
 
-	useEffect(() => {
-		const socket = io('http://localhost:57921', {
-      query: { gameId: 1111 } // Send gameId as part of the query
+const Game = ({ gameId, playerId }) => {
+  const [game, setGame] = useState(null);
+  const [gameData, setGameData] = useState(defaultGameData);
+  const [socket, setSocket] = useState(null);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (gameId) {
+      const chessSocket = new ChessSocket(gameId);
+
+      chessSocket.on('connect_error', err => {
+        console.error(err);
+        setError(true);
+      });
+
+      chessSocket.on('latest', latest => {
+        if (!game) {
+          setGameData({
+            whitePlayerId: latest.white_player_id,
+            blackPlayerId: latest.black_player_id,
+            playerColor:
+              playerId === latest.white_player_id ? 'white' : 'black',
+          });
+        }
+
+        setGame(new Chess(latest.current_fen));
+        setGameData(prev => ({
+          ...prev,
+          currentFen: latest.current_fen,
+          previousFen: latest.previous_fen,
+          turn: latest.turn_color,
+        }));
+      });
+
+      setSocket(chessSocket);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gameId, playerId]);
+
+  // --> Hook only for dev 'switch player id' use case.
+  useEffect(() => {
+    if (gameData.whitePlayerId) {
+      setGameData(prev => ({
+        ...prev,
+        playerColor: playerId === gameData.whitePlayerId ? 'white' : 'black',
+      }));
+    }
+  }, [playerId, gameData.whitePlayerId]);
+	// <--
+  function makeAMove(move) {
+    const gameCopy = { ...game };
+    const result = gameCopy.move(move);
+    setGame(() => gameCopy);
+    return result;
+  }
+
+  function onDrop(sourceSquare, targetSquare) {
+    const { turn, playerColor } = gameData;
+    if (turn !== playerColor) return;
+    const move = makeAMove({
+      from: sourceSquare,
+      to: targetSquare,
+      promotion: 'q',
     });
-		socket.connect();
-	}, []);
-
-	function makeAMove(move) {
-		const gameCopy = { ...game };
-		const result = gameCopy.move(move);
-		setGame(gameCopy);
-		return result;
-	}
-
-  function rotateBoard(playerId, existingGame){
-    if(String(playerId) === existingGame.data.attributes.black_player_id){
-      setPlayerColor('black')
-    }
+    // catch illegal move
+    if (move === null) return false;
+    // --> game ending scenarios will need to be handled.
+    if (game.game_over()) setGameData(prev => ({ ...prev, complete: true }));
+    if (game.in_draw()) setGameData(prev => ({ ...prev, draw: true }));
+		// <--
+    socket.emit('make_move', { current: game.fen() });
+    return true;
   }
 
-  useEffect(()=>{
-    rotateBoard(playerId, gameJson)
-  },[])
-
-  function initializeGame(existingGame){
-    if (existingGame){
-      const game = new Chess(existingGame.data.attributes.current_fen)
-      return (game)
-    }
-    const game = new Chess()
-    return(game)
-  }
-
-	function makeRandomMove() {
-		const possibleMoves = game.moves();
-		if (game.game_over() || game.in_draw() || possibleMoves.length === 0) return;
-		const randomIndex = Math.floor(Math.random() * possibleMoves.length);
-		makeAMove(possibleMoves[randomIndex]);
-	}
-
-	function onDrop(sourceSquare, targetSquare) {
-		const move = makeAMove({
-			from: sourceSquare,
-			to: targetSquare,
-			promotion: 'q' // always promote to a queen for example simplicity
-		});
-
-		// illegal move
-		if (move === null) return false;
-		console.log(game.fen());
-		setTimeout(makeRandomMove, 200);
-		return true;
-	}
-
-  return <Chessboard position={game.fen()} onPieceDrop={onDrop} boardOrientation={playerColor} />;
+  return error ? (
+    <LoadError />
+  ) : game ? (
+    <Chessboard
+      position={game.fen()}
+      onPieceDrop={onDrop}
+      boardOrientation={gameData.playerColor}
+    />
+  ) : (
+    <Loading />
+  );
 };
 
 export default Game;
