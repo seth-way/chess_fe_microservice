@@ -7,7 +7,14 @@ import { sampleGameObject } from '../../../mock_data/dummyGame';
 const Game = ({gameId, playerId}) => {
   const [playerColor, setPlayerColor] = useState('white')
   const [gameJson, setGameJson] = useState(sampleGameObject)
-  const [game, setGame] = useState(initializeGame(gameJson));
+	const [game, setGame] = useState(initializeGame(gameJson));
+
+	useEffect(() => {
+		const socket = io('http://localhost:57921', {
+      query: { gameId: 1111 } // Send gameId as part of the query
+    });
+		socket.connect();
+	}, []);
 
   function makeAMove(move) {
     const gameCopy = { ...game };
@@ -36,13 +43,12 @@ const Game = ({gameId, playerId}) => {
     return(game)
   }
 
-  function makeRandomMove() {
-    const possibleMoves = game.moves();
-    if (game.game_over() || game.in_draw() || possibleMoves.length === 0)
-      return;
-    const randomIndex = Math.floor(Math.random() * possibleMoves.length);
-    makeAMove(possibleMoves[randomIndex]);
-  }
+	function makeRandomMove() {
+		const possibleMoves = game.moves();
+		if (game.game_over() || game.in_draw() || possibleMoves.length === 0) return;
+		const randomIndex = Math.floor(Math.random() * possibleMoves.length);
+		makeAMove(possibleMoves[randomIndex]);
+	}
 
   function onDrop(sourceSquare, targetSquare) {
     const move = makeAMove({
