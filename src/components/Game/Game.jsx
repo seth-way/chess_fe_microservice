@@ -31,6 +31,11 @@ const Game = ({ gameId, playerId }) => {
         console.error(err);
         setError(true);
       });
+      chessSocket.on(`game_info_${gameId}`, (game_data)=>{
+        console.log(game_data.current_fen)
+        const loadedGame = new Chess(game_data.current_fen)
+        setGame(loadedGame)
+      })
 
       chessSocket.on('latest', latest => {
         if (!game) {

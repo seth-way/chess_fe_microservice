@@ -2,10 +2,10 @@ import { useState } from 'react';
 import './App.css';
 import Game from './components/Game/Game';
 
-const games = ['1111', '2222', '3333', '4444', '5555'];
+const games = ['1', '2', '3', '4', '5'];
 
 function App() {
-  const [gameId, setGameId] = useState('5555');
+  const [gameId, setGameId] = useState('3');
   const [playerId, setPlayerId] = useState('1');
 
   const handleClick = e => {
