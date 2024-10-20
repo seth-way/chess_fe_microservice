@@ -1,0 +1,15 @@
+{
+    "id": "1111",
+     "turn_number": "2",
+     "turn_color": "black",
+     "previous_fen": "rnbqk2r/pppp1ppp/4pn2/8/4P3/2N5/PPPP1PPP/R1BQKB1R b KQkq - 1 3",
+     "current_fen": "rnbqk2r/pppp2pp/4pn2/5p2/4P3/2N5/PPPP1PPP/R1BQKB1R w KQkq f6 0 4",
+     "white_player_id": "1",
+     "black_player_id": "2",
+     "white_player_points": "0",
+     "black_player_points": "0",
+     "game_complete": "false",
+     "game_outcome": "null",
+     "game_champion": "null",
+     "last_move": "<timestamp>"
+}
