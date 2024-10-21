@@ -31,11 +31,19 @@ const Game = ({ gameId, playerId }) => {
         console.error(err);
         setError(true);
       });
+      
       chessSocket.on(`game_info_${gameId}`, (game_data)=>{
         console.log(game_data.current_fen)
         const loadedGame = new Chess(game_data.current_fen)
         loadedGame.gameId = gameId
         setGame(loadedGame)
+      })
+
+      chessSocket.on(`move_made_${gameId}`,(game_data)=>{
+        console.log(gameData)
+        const updatedGame = new Chess(game_data.current_fen)
+        updatedGame.gameId = gameId
+        setGame(updatedGame)
       })
 
       chessSocket.on('latest', latest => {
