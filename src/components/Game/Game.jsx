@@ -34,6 +34,7 @@ const Game = ({ gameId, playerId }) => {
       chessSocket.on(`game_info_${gameId}`, (game_data)=>{
         console.log(game_data.current_fen)
         const loadedGame = new Chess(game_data.current_fen)
+        loadedGame.gameId = gameId
         setGame(loadedGame)
       })
 
@@ -92,7 +93,7 @@ const Game = ({ gameId, playerId }) => {
     if (game.game_over()) setGameData(prev => ({ ...prev, complete: true }));
     if (game.in_draw()) setGameData(prev => ({ ...prev, draw: true }));
 		// <--
-    socket.emit('make_move', { current: game.fen() });
+    socket.emit('make_move', { fen: game.fen(), game_id: game.gameId  });
     return true;
   }
 
