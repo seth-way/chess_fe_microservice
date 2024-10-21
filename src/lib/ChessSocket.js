@@ -1,7 +1,7 @@
 import { io } from 'socket.io-client';
 
 export default function ChessSocket(gameId) {
-  const socket = io(`localhost:5000/?q=${gameId}`, { query: { gameId } });
+  const socket = io(`localhost:5000/?q=${gameId}`);
   console.log(socket)
   socket.connect();
   return socket;
