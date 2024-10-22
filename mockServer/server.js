@@ -1,86 +1,72 @@
 import { Server } from 'socket.io';
 import { Chess } from 'chess.js';
 import getPort from 'get-port';
+let gameInfo;
+
 (async () => {
-	// Try to use port 5000, fallback if needed
-	const port = await getPort({ port: 57921 });
+  // Try to use port 57921, fallback if needed
+  const port = await getPort({ port: 57921 });
 
-	const io = new Server(port, {
-		cors: {
-			origin: 'http://localhost:5173', // Replace with your Vite app's URL
-			methods: ['GET', 'POST']
-		}
-	});
+  const io = new Server(port, {
+    cors: {
+      origin: 'http://localhost:5173',
+      methods: ['GET', 'POST'],
+    },
+  });
 
-	io.on('connection', async socket => {
-		const gameId = socket.handshake.query.gameId;
-		console.log(`Connected to game with ID: ${gameId}`);
-		const game = await handleConnection(gameId, socket);
-		console.log('GAME', game);
-	});
+  io.on('connect', socket => {
+    const gameId = socket.handshake.query.gameId;
+    console.log(`Connected to game with ID: ${gameId}`);
+    handleConnection(gameId, socket);
 
-	console.log(`Mock WebSocket server is running on port ${port} in development mode.`);
+      socket.on('make_move', fen => {
+        console.log('fennnnn', fen);
+        gameInfo.previous_fen = gameInfo.current_fen;
+        gameInfo.current_fen = makeRandomMove(fen.current);
+        gameInfo.turn_color = gameInfo.current_fen.includes('w')
+          ? 'white'
+          : 'black';
+        sendLatest(socket);
+      });
+  });
 
-	// Graceful shutdown on SIGINT (e.g., when you press Ctrl+C)
-	process.on('SIGINT', () => {
-		console.log('Server shutting down...');
-		io.close(() => {
-			console.log('Server closed');
-			process.exit(0); // Ensure exit after shutdown
-		});
-	});
+  console.log(
+    `Mock WebSocket server is running on port ${port} in development mode.`
+  );
+
+  // Graceful shutdown on SIGINT (e.g., when you press Ctrl+C)
+  process.on('SIGINT', () => {
+    console.log('Server shutting down...');
+    io.close(() => {
+      console.log('Server closed');
+      process.exit(0);
+    });
+  });
 })();
 
 async function handleConnection(gameId, socket) {
-	try {
-		const game = await import(`./dummyData/games/${gameId}.json`);
-		sendLatest(game, socket);
-		return game;
-	} catch (error) {
-		console.error('Error loading the JSON file:', error);
-	}
+  try {
+    const game = await import(`./dummyData/games/${gameId}.json`, {
+      with: { type: 'json' },
+    });
+    console.log('game.default', game.default);
+    gameInfo = { ...game.default };
+    sendLatest(socket);
+  } catch (error) {
+    console.error('Error loading the JSON file:', error);
+  }
 }
 
-function sendLatest(game, socket) {
-	const data = {
-		event: 'latest',
-		game: {
-			current_fen: game.current_fen,
-			previous_fen: game.previous_fen,
-			white_player_id: game.white_player_id,
-			black_player_id: game.black_player_id,
-			turn_color: game.turn_color
-		}
-	};
-
-	socket.send(JSON.stringify(data));
+function sendLatest(socket) {
+  socket.emit('latest', gameInfo);
 }
 
-// function makeAMove(move) {
-//   const gameCopy = { ...game };
-//   const result = gameCopy.move(move);
-//   setGame(gameCopy);
-//   return result;
-// }
+function makeRandomMove(fen) {
+  const game = new Chess(fen);
 
-// function makeRandomMove() {
-//   const possibleMoves = game.moves();
-//   if (game.game_over() || game.in_draw() || possibleMoves.length === 0)
-//     return;
-//   const randomIndex = Math.floor(Math.random() * possibleMoves.length);
-//   makeAMove(possibleMoves[randomIndex]);
-// }
-
-// function onDrop(sourceSquare, targetSquare) {
-//   const move = makeAMove({
-//     from: sourceSquare,
-//     to: targetSquare,
-//     promotion: 'q', // always promote to a queen for example simplicity
-//   });
-
-//   // illegal move
-//   if (move === null) return false;
-//   console.log(game.fen());
-//   setTimeout(makeRandomMove, 200);
-//   return true;
-// }
+  const possibleMoves = game.moves();
+  if (game.game_over() || game.in_draw() || possibleMoves.length === 0) return;
+  const randomIndex = Math.floor(Math.random() * possibleMoves.length);
+  game.move(possibleMoves[randomIndex]);
+  return game.fen();
+}

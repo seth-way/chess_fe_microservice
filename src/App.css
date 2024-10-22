@@ -8,4 +8,20 @@
 .game-area {
   min-height: 500px;
   min-width: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+
+  .active {
+    color: yellow;
+  }
 }
