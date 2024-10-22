@@ -5,12 +5,13 @@ import Game from './components/Game/Game';
 const games = ['1', '2', '3', '4', '5'];
 
 function App() {
-  const [gameId, setGameId] = useState('3');
-  const [playerId, setPlayerId] = useState('1');
+  const [gameId, setGameId] = useState('5');
+  const [playerId, setPlayerId] = useState('3');
 
   const handleClick = e => {
     if (e.target.value === 'player') {
       setPlayerId(e.target.id);
+      console.log(playerId)
     } else {
       setGameId(e.target.id);
     }
@@ -24,9 +25,9 @@ function App() {
       <div className='buttons'>
         <button
           onClick={handleClick}
-          id='1'
+          id='3'
           value='player'
-          className={playerId === '1' ? 'active' : ''}
+          className={playerId === '3' ? 'active' : ''}
         >
           White
         </button>
