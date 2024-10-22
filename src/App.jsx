@@ -11,6 +11,7 @@ function App() {
   const handleClick = e => {
     if (e.target.value === 'player') {
       setPlayerId(e.target.id);
+      console.log(playerId)
     } else {
       setGameId(e.target.id);
     }

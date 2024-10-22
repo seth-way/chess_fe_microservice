@@ -21,9 +21,10 @@ const defaultGameData = {
 
 const Game = ({ gameId, playerId }) => {
   const [game, setGame] = useState(null);
-  const [gameData, setGameData] = useState(defaultGameData);
+  const [gameData, setGameData] = useState({});
   const [socket, setSocket] = useState(null);
   const [error, setError] = useState(null);
+  const [playerColor, setPlayerColor] = useState("white")
 
   useEffect(() => {
     if (gameId) {
@@ -33,6 +34,13 @@ const Game = ({ gameId, playerId }) => {
         console.error(err);
         setError(true);
       });
+      
+      chessSocket.on(`game_info_${gameId}`, (game_data)=>{
+        if(String(game_data.white_player_id) !== playerId){
+          setPlayerColor('black')
+        };
+        updateGameFromFen(game_data.current_fen)
+      })
 
       chessSocket.on('latest', latest => {
         setGame(new Chess(latest.current_fen));
@@ -74,11 +82,17 @@ const Game = ({ gameId, playerId }) => {
     }
   }, [playerId, gameData]);
   // <--
+
   function makeAMove(move) {
     const gameCopy = { ...game };
     const result = gameCopy.move(move);
     setGame(() => gameCopy);
     return result;
+  }
+
+  function checkTurnFromFen(fen){
+    const turn = fen.split(' ')[1]
+    return playerColor.includes(turn)
   }
 
   function onDrop(sourceSquare, targetSquare) {
@@ -103,7 +117,7 @@ const Game = ({ gameId, playerId }) => {
     <LoadError />
   ) : game ? (
     <Chessboard
-      position={game.fen()}
+      position={game.fen()}Í
       onPieceDrop={onDrop}
       boardOrientation={gameData.playerColor}
       customDarkSquareStyle={{

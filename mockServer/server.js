@@ -14,7 +14,7 @@ let gameInfo;
     },
   });
 
-  io.on('connection', socket => {
+  io.on('connect', socket => {
     const gameId = socket.handshake.query.gameId;
     console.log(`Connected to game with ID: ${gameId}`);
     handleConnection(gameId, socket);
