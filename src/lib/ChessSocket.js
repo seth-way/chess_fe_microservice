@@ -1,13 +1,13 @@
 import { io } from 'socket.io-client';
 
 export default function ChessSocket(gameId) {
-  const socket = io('http://127.0.0.1:5000', {
+  const socket = io('https://chess-game-be-fmpc.onrender.com/', {
     transports: ['websocket'], // Force the use of WebSockets only
     query: {
       gameId,
     },
   });
-  
+
   socket.connect();
   return socket;
 }
