@@ -1,8 +1,13 @@
 import { io } from 'socket.io-client';
 
 export default function ChessSocket(gameId) {
-  const socket = io(`localhost:5000/?q=${gameId}`);
-  console.log(socket)
+  const socket = io('http://127.0.0.1:5000', {
+    transports: ['websocket'], // Force the use of WebSockets only
+    query: {
+      gameId,
+    },
+  });
+  
   socket.connect();
   return socket;
 }

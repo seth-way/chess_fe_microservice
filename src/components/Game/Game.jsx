@@ -6,6 +6,19 @@ import ChessSocket from '../../lib/ChessSocket';
 import Loading from '../Loading/Loading';
 import LoadError from '../LoadError/LoadError';
 
+const defaultGameData = {
+  playerColor: 'white',
+  turnColor: 'white',
+  turnNumber: 1,
+  whitePlayerId: '',
+  blackPlayerId: '',
+  currentFen: '',
+  previousFen: '',
+  complete: false,
+  champion: '',
+  draw: false,
+};
+
 const Game = ({ gameId, playerId }) => {
   const [game, setGame] = useState(null);
   const [gameData, setGameData] = useState({});
@@ -29,29 +42,46 @@ const Game = ({ gameId, playerId }) => {
         updateGameFromFen(game_data.current_fen)
       })
 
-      chessSocket.on(`move_made_${gameId}`,(game_data)=>{
-        updateGameFromFen(game_data.current_fen)
-      })
-
+      chessSocket.on('latest', latest => {
+        setGame(new Chess(latest.current_fen));
+        setGameData(prev => ({
+          ...prev,
+          currentFen: latest.current_fen,
+          previousFen: latest.previous_fen,
+          turnColor: latest.turn_color,
+          whitePlayerId: latest.white_player_id,
+          blackPlayerId: latest.black_player_id,
+          playerColor: playerId === latest.white_player_id ? 'white' : 'black',
+        }));
+      });
       setSocket(chessSocket);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameId, playerId]);
-
-  function updateGameFromFen(fen){
-    const updatedGame = new Chess(fen);
-    setGame(updatedGame);
-  }
-
-  function updateGameData(game_data){
-    const newGameData = {
-      previousFen: game_data.previous_fen,
-      currentFen: game_data.current_fen,
-      complete: game_data.game_complete,
-      outcome: game_data.game_outcome
+  // check for game complete on game updates
+  useEffect(() => {
+    if (game) {
+      setGameData(prev => ({
+        ...prev,
+        complete: game.game_over(),
+        draw: game.in_draw(),
+      }));
     }
-    setGameData(newGameData)
-  };
+  }, [game]);
+  // --> Hook only for dev 'switch player id' use case.
+  useEffect(() => {
+    if (gameData.whitePlayerId) {
+      const newColor = playerId === gameData.whitePlayerId ? 'white' : 'black';
+      // check prevents infinite rerender loop.
+      if (gameData.playerColor !== newColor) {
+        setGameData(prev => ({
+          ...prev,
+          playerColor: newColor,
+        }));
+      }
+    }
+  }, [playerId, gameData]);
+  // <--
 
   function makeAMove(move) {
     const gameCopy = { ...game };
@@ -66,7 +96,8 @@ const Game = ({ gameId, playerId }) => {
   }
 
   function onDrop(sourceSquare, targetSquare) {
-    if (!checkTurnFromFen(game.fen())){ return };
+    const { turnColor, playerColor } = gameData;
+    if (turnColor !== playerColor) return;
     const move = makeAMove({
       from: sourceSquare,
       to: targetSquare,
@@ -75,10 +106,10 @@ const Game = ({ gameId, playerId }) => {
     // catch illegal move
     if (move === null) return false;
     // --> game ending scenarios will need to be handled.
-    // if (game.game_over()) setGameData(prev => ({ ...prev, complete: true }));
-    // if (game.in_draw()) setGameData(prev => ({ ...prev, draw: true }));
-		// <--
-    socket.emit('make_move', { fen: game.fen(), game_id: gameId });
+    if (game.game_over()) setGameData(prev => ({ ...prev, complete: true }));
+    if (game.in_draw()) setGameData(prev => ({ ...prev, draw: true }));
+    // <--
+    socket.emit('make_move', { current_fen: game.fen(), game_id: gameId });
     return true;
   }
 
@@ -88,7 +119,13 @@ const Game = ({ gameId, playerId }) => {
     <Chessboard
       position={game.fen()}Í
       onPieceDrop={onDrop}
-      boardOrientation={playerColor}
+      boardOrientation={gameData.playerColor}
+      customDarkSquareStyle={{
+        backgroundColor: '#4E98D9',
+      }}
+      customLightSquareStyle={{
+        backgroundColor: '#CEE1F2',
+      }}
     />
   ) : (
     <Loading />

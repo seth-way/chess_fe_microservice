@@ -19,15 +19,15 @@ let gameInfo;
     console.log(`Connected to game with ID: ${gameId}`);
     handleConnection(gameId, socket);
 
-    socket.on('make_move', fen => {
-      console.log('fennnnn', fen);
-      gameInfo.previous_fen = gameInfo.current_fen;
-      gameInfo.current_fen = makeRandomMove(fen.current);
-      gameInfo.turn_color = gameInfo.current_fen.includes('w')
-        ? 'white'
-        : 'black';
-      sendLatest(socket);
-    });
+      socket.on('make_move', fen => {
+        console.log('fennnnn', fen);
+        gameInfo.previous_fen = gameInfo.current_fen;
+        gameInfo.current_fen = makeRandomMove(fen.current);
+        gameInfo.turn_color = gameInfo.current_fen.includes('w')
+          ? 'white'
+          : 'black';
+        sendLatest(socket);
+      });
   });
 
   console.log(
