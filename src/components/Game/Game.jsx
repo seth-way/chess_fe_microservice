@@ -6,17 +6,6 @@ import ChessSocket from '../../lib/ChessSocket';
 import Loading from '../Loading/Loading';
 import LoadError from '../LoadError/LoadError';
 
-const defaultGameData = {
-  playerColor: 'white',
-  turn: 'white',
-  whitePlayerId: '',
-  blackPlayerId: '',
-  currentFen: '',
-  previousFen: '',
-  complete: false,
-  draw: false,
-};
-
 const Game = ({ gameId, playerId }) => {
   const [game, setGame] = useState(null);
   const [gameData, setGameData] = useState({});
@@ -46,40 +35,21 @@ const Game = ({ gameId, playerId }) => {
         setGame(updatedGame);
       })
 
-      chessSocket.on('latest', latest => {
-        if (!game) {
-          setGameData({
-            whitePlayerId: latest.white_player_id,
-            blackPlayerId: latest.black_player_id,
-            playerColor:
-              playerId === latest.white_player_id ? 'white' : 'black',
-          });
-        }
-
-        setGame(new Chess(latest.current_fen));
-        setGameData(prev => ({
-          ...prev,
-          currentFen: latest.current_fen,
-          previousFen: latest.previous_fen,
-          turn: latest.turn_color,
-        }));
-      });
-
       setSocket(chessSocket);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameId, playerId]);
 
-  // --> Hook only for dev 'switch player id' use case.
-  useEffect(() => {
-    if (gameData.whitePlayerId) {
-      setGameData(prev => ({
-        ...prev,
-        playerColor: playerId === gameData.whitePlayerId ? 'white' : 'black',
-      }));
+  function updateGameData(game_data){
+    const newGameData = {
+      previousFen: game_data.previous_fen,
+      currentFen: game_data.current_fen,
+      complete: game_data.game_complete,
+      outcome: game_data.game_outcome
     }
-  }, [playerId, gameData.whitePlayerId]);
-	// <--
+    setGameData(newGameData)
+  };
+
   function makeAMove(move) {
     const gameCopy = { ...game };
     const result = gameCopy.move(move);
@@ -102,8 +72,8 @@ const Game = ({ gameId, playerId }) => {
     // catch illegal move
     if (move === null) return false;
     // --> game ending scenarios will need to be handled.
-    if (game.game_over()) setGameData(prev => ({ ...prev, complete: true }));
-    if (game.in_draw()) setGameData(prev => ({ ...prev, draw: true }));
+    // if (game.game_over()) setGameData(prev => ({ ...prev, complete: true }));
+    // if (game.in_draw()) setGameData(prev => ({ ...prev, draw: true }));
 		// <--
     socket.emit('make_move', { fen: game.fen(), game_id: gameId });
     return true;
@@ -113,7 +83,7 @@ const Game = ({ gameId, playerId }) => {
     <LoadError />
   ) : game ? (
     <Chessboard
-      position={game.fen()}
+      position={game.fen()}Í
       onPieceDrop={onDrop}
       boardOrientation={playerColor}
     />
