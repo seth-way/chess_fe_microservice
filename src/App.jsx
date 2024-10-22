@@ -2,11 +2,11 @@ import { useState } from 'react';
 import './App.css';
 import Game from './components/Game/Game';
 
-const games = ['1111', '2222', '3333', '4444', '5555'];
+const games = [1, 2, 3, 4, 5];
 
 function App() {
-  const [gameId, setGameId] = useState('5555');
-  const [playerId, setPlayerId] = useState('1');
+  const [gameId, setGameId] = useState(1);
+  const [playerId, setPlayerId] = useState(1);
 
   const handleClick = e => {
     if (e.target.value === 'player') {
@@ -19,22 +19,22 @@ function App() {
   return (
     <>
       <div className='game-area'>
-        <Game gameId={gameId} playerId={playerId} />
+        <Game gameId={gameId} playerId={Number(playerId.toString())} />
       </div>
       <div className='buttons'>
         <button
           onClick={handleClick}
-          id='1'
+          id={1}
           value='player'
-          className={playerId === '1' ? 'active' : ''}
+          className={playerId === 1 ? 'active' : ''}
         >
           White
         </button>
         <button
           onClick={handleClick}
-          id='2'
+          id={2}
           value='player'
-          className={playerId === '2' ? 'active' : ''}
+          className={playerId === 2 ? 'active' : ''}
         >
           Black
         </button>

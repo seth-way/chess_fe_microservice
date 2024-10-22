@@ -8,12 +8,14 @@ import LoadError from '../LoadError/LoadError';
 
 const defaultGameData = {
   playerColor: 'white',
-  turn: 'white',
+  turnColor: 'white',
+  turnNumber: 1,
   whitePlayerId: '',
   blackPlayerId: '',
   currentFen: '',
   previousFen: '',
   complete: false,
+  champion: '',
   draw: false,
 };
 
@@ -33,39 +35,45 @@ const Game = ({ gameId, playerId }) => {
       });
 
       chessSocket.on('latest', latest => {
-        if (!game) {
-          setGameData({
-            whitePlayerId: latest.white_player_id,
-            blackPlayerId: latest.black_player_id,
-            playerColor:
-              playerId === latest.white_player_id ? 'white' : 'black',
-          });
-        }
-
         setGame(new Chess(latest.current_fen));
         setGameData(prev => ({
           ...prev,
           currentFen: latest.current_fen,
           previousFen: latest.previous_fen,
-          turn: latest.turn_color,
+          turnColor: latest.turn_color,
+          whitePlayerId: latest.white_player_id,
+          blackPlayerId: latest.black_player_id,
+          playerColor: playerId === latest.white_player_id ? 'white' : 'black',
         }));
       });
-
       setSocket(chessSocket);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameId, playerId]);
-
+  // check for game complete on game updates
+  useEffect(() => {
+    if (game) {
+      setGameData(prev => ({
+        ...prev,
+        complete: game.game_over(),
+        draw: game.in_draw(),
+      }));
+    }
+  }, [game]);
   // --> Hook only for dev 'switch player id' use case.
   useEffect(() => {
     if (gameData.whitePlayerId) {
-      setGameData(prev => ({
-        ...prev,
-        playerColor: playerId === gameData.whitePlayerId ? 'white' : 'black',
-      }));
+      const newColor = playerId === gameData.whitePlayerId ? 'white' : 'black';
+      // check prevents infinite rerender loop.
+      if (gameData.playerColor !== newColor) {
+        setGameData(prev => ({
+          ...prev,
+          playerColor: newColor,
+        }));
+      }
     }
-  }, [playerId, gameData.whitePlayerId]);
-	// <--
+  }, [playerId, gameData]);
+  // <--
   function makeAMove(move) {
     const gameCopy = { ...game };
     const result = gameCopy.move(move);
@@ -74,8 +82,8 @@ const Game = ({ gameId, playerId }) => {
   }
 
   function onDrop(sourceSquare, targetSquare) {
-    const { turn, playerColor } = gameData;
-    if (turn !== playerColor) return;
+    const { turnColor, playerColor } = gameData;
+    if (turnColor !== playerColor) return;
     const move = makeAMove({
       from: sourceSquare,
       to: targetSquare,
@@ -86,8 +94,8 @@ const Game = ({ gameId, playerId }) => {
     // --> game ending scenarios will need to be handled.
     if (game.game_over()) setGameData(prev => ({ ...prev, complete: true }));
     if (game.in_draw()) setGameData(prev => ({ ...prev, draw: true }));
-		// <--
-    socket.emit('make_move', { current: game.fen() });
+    // <--
+    socket.emit('make_move', { current_fen: game.fen(), game_id: gameId });
     return true;
   }
 
@@ -98,6 +106,12 @@ const Game = ({ gameId, playerId }) => {
       position={game.fen()}
       onPieceDrop={onDrop}
       boardOrientation={gameData.playerColor}
+      customDarkSquareStyle={{
+        backgroundColor: '#4E98D9',
+      }}
+      customLightSquareStyle={{
+        backgroundColor: '#CEE1F2',
+      }}
     />
   ) : (
     <Loading />
