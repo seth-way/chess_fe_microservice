@@ -26,19 +26,22 @@ const Game = ({ gameId, playerId }) => {
         if(String(game_data.white_player_id) !== playerId){
           setPlayerColor('black')
         };
-        const loadedGame = new Chess(game_data.current_fen);
-        setGame(loadedGame);
+        updateGameFromFen(game_data.current_fen)
       })
 
       chessSocket.on(`move_made_${gameId}`,(game_data)=>{
-        const updatedGame = new Chess(game_data.current_fen);
-        setGame(updatedGame);
+        updateGameFromFen(game_data.current_fen)
       })
 
       setSocket(chessSocket);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameId, playerId]);
+
+  function updateGameFromFen(fen){
+    const updatedGame = new Chess(fen);
+    setGame(updatedGame);
+  }
 
   function updateGameData(game_data){
     const newGameData = {
