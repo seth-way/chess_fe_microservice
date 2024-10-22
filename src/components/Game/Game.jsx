@@ -19,9 +19,10 @@ const defaultGameData = {
 
 const Game = ({ gameId, playerId }) => {
   const [game, setGame] = useState(null);
-  const [gameData, setGameData] = useState(defaultGameData);
+  const [gameData, setGameData] = useState({});
   const [socket, setSocket] = useState(null);
   const [error, setError] = useState(null);
+  const [playerColor, setPlayerColor] = useState("white")
 
   useEffect(() => {
     if (gameId) {
@@ -33,17 +34,16 @@ const Game = ({ gameId, playerId }) => {
       });
       
       chessSocket.on(`game_info_${gameId}`, (game_data)=>{
-        console.log(game_data.current_fen)
-        const loadedGame = new Chess(game_data.current_fen)
-        loadedGame.gameId = gameId
-        setGame(loadedGame)
+        if(String(game_data.white_player_id) !== playerId){
+          setPlayerColor('black')
+        };
+        const loadedGame = new Chess(game_data.current_fen);
+        setGame(loadedGame);
       })
 
       chessSocket.on(`move_made_${gameId}`,(game_data)=>{
-        console.log(gameData)
-        const updatedGame = new Chess(game_data.current_fen)
-        updatedGame.gameId = gameId
-        setGame(updatedGame)
+        const updatedGame = new Chess(game_data.current_fen);
+        setGame(updatedGame);
       })
 
       chessSocket.on('latest', latest => {
@@ -87,9 +87,13 @@ const Game = ({ gameId, playerId }) => {
     return result;
   }
 
+  function checkTurnFromFen(fen){
+    const turn = fen.split(' ')[1]
+    return playerColor.includes(turn)
+  }
+
   function onDrop(sourceSquare, targetSquare) {
-    const { turn, playerColor } = gameData;
-    if (turn !== playerColor) return;
+    if (!checkTurnFromFen(game.fen())){ return };
     const move = makeAMove({
       from: sourceSquare,
       to: targetSquare,
@@ -101,7 +105,7 @@ const Game = ({ gameId, playerId }) => {
     if (game.game_over()) setGameData(prev => ({ ...prev, complete: true }));
     if (game.in_draw()) setGameData(prev => ({ ...prev, draw: true }));
 		// <--
-    socket.emit('make_move', { fen: game.fen(), game_id: game.gameId  });
+    socket.emit('make_move', { fen: game.fen(), game_id: gameId });
     return true;
   }
 
@@ -111,7 +115,7 @@ const Game = ({ gameId, playerId }) => {
     <Chessboard
       position={game.fen()}
       onPieceDrop={onDrop}
-      boardOrientation={gameData.playerColor}
+      boardOrientation={playerColor}
     />
   ) : (
     <Loading />
