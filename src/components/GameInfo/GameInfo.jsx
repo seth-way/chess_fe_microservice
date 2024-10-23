@@ -11,7 +11,7 @@ function GameInfo({turnColor, opponentName, complete, draw, champion}){
         gameState = 'Game complete: draw.'
         :gameState = `Game complete: ${champion} won.`;
     } else {
-        gameState = turnColor;
+        gameState = `Current turn: ${turnColor}`;
     };
     return(
         <ul className="game-info">
