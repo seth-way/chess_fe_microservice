@@ -28,7 +28,6 @@ const Game = ({ gameId, playerId }) => {
 
   useEffect(() => {
     if (gameId) {
-      console.log('attempting to connect with game id:', gameId);
       const chessSocket = new ChessSocket(gameId);
 
       chessSocket.on('connect_error', err => {
