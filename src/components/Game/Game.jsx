@@ -27,7 +27,7 @@ const Game = ({ gameId, playerId }) => {
   const [error, setError] = useState(null);
   const [playerColor, setPlayerColor] = useState("white")
   const [opponentName, setOpponentName] = useState("Unknown-Player")
-  
+
   useEffect(() => {
     if (gameId) {
       const chessSocket = new ChessSocket(gameId);
@@ -118,7 +118,7 @@ const Game = ({ gameId, playerId }) => {
   return error ? (
     <LoadError />
   ) : game ? (
-    <>
+    <div className='chess-service'>
     <GameInfo 
       turnColor = {gameData.turnColor} 
       opponentName = {opponentName} 
@@ -137,7 +137,7 @@ const Game = ({ gameId, playerId }) => {
         backgroundColor: '#CEE1F2',
       }}
     />
-    </>
+    </div>
   ) : (
     <Loading />
   );
