@@ -14,9 +14,10 @@ const defaultGameData = {
   blackPlayerId: '',
   currentFen: '',
   previousFen: '',
-  complete: false,
+  outcome: '',
   champion: '',
-  draw: false,
+  // need to track if game over status came from server or local.
+  resultsReceived: false,
 };
 
 const Game = ({ gameId, playerId }) => {
@@ -27,6 +28,7 @@ const Game = ({ gameId, playerId }) => {
 
   useEffect(() => {
     if (gameId) {
+      console.log('attempting to connect with game id:', gameId);
       const chessSocket = new ChessSocket(gameId);
 
       chessSocket.on('connect_error', err => {
@@ -35,32 +37,47 @@ const Game = ({ gameId, playerId }) => {
       });
 
       chessSocket.on('latest', latest => {
-        setGame(new Chess(latest.current_fen));
-        setGameData(prev => ({
-          ...prev,
-          currentFen: latest.current_fen,
-          previousFen: latest.previous_fen,
-          turnColor: latest.turn_color,
-          whitePlayerId: latest.white_player_id,
-          blackPlayerId: latest.black_player_id,
-          playerColor: playerId === latest.white_player_id ? 'white' : 'black',
-        }));
+        if (error) setError(() => false);
+        if (
+          latest.current_fen !== gameData.currentFen &&
+          !gameData.resultsReceived
+        ) {
+          const latestGame = new Chess(latest.current_fen);
+          setGame(() => latestGame);
+          setGameData(prev => ({
+            ...prev,
+            currentFen: latest.current_fen,
+            previousFen: latest.previous_fen,
+            turnColor: latest.turn_color,
+            whitePlayerId: latest.white_player_id,
+            blackPlayerId: latest.black_player_id,
+            playerColor:
+              playerId === latest.white_player_id ? 'white' : 'black',
+            outcome: latest.game_outcome,
+            champion: latest.game_champion,
+            resultsReceived: latest.game_complete,
+          }));
+        }
       });
+
       setSocket(chessSocket);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameId, playerId]);
-  // check for game complete on game updates
+
   useEffect(() => {
-    if (game) {
-      setGameData(prev => ({
-        ...prev,
-        complete: game.game_over(),
-        draw: game.in_draw(),
-      }));
+    const { outcome, champion, resultsReceived } = gameData;
+    if (outcome && outcome.length && !resultsReceived) {
+      socket.emit('end_game', {
+        game_id: gameId,
+        current_fen: game.fen(),
+        game_outcome: outcome,
+        game_champion: champion,
+      });
     }
-  }, [game]);
-  // --> Hook only for dev 'switch player id' use case.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gameData.outcome, gameData.champion, gameData.resultsReceived]);
+  // ** --> Hook only for dev 'switch player id' use case.
   useEffect(() => {
     if (gameData.whitePlayerId) {
       const newColor = playerId === gameData.whitePlayerId ? 'white' : 'black';
@@ -73,7 +90,7 @@ const Game = ({ gameId, playerId }) => {
       }
     }
   }, [playerId, gameData]);
-  // <--
+  // <-- **
   function makeAMove(move) {
     const gameCopy = { ...game };
     const result = gameCopy.move(move);
@@ -91,12 +108,29 @@ const Game = ({ gameId, playerId }) => {
     });
     // catch illegal move
     if (move === null) return false;
-    // --> game ending scenarios will need to be handled.
-    if (game.game_over()) setGameData(prev => ({ ...prev, complete: true }));
-    if (game.in_draw()) setGameData(prev => ({ ...prev, draw: true }));
-    // <--
-    socket.emit('make_move', { current_fen: game.fen(), game_id: gameId });
+    const gameComplete = checkGameCompletion(game);
+    if (!gameComplete) socket.makeMove(game.fen(), gameId);
     return true;
+  }
+
+  function checkGameCompletion(currentGame) {
+    if (currentGame.game_over()) {
+      if (currentGame.in_draw()) {
+        setGameData(prev => ({ ...prev, outcome: 'draw' }));
+      } else if (currentGame.in_stalemate()) {
+        setGameData(prev => ({ ...prev, outcome: 'stalemate' }));
+      } else if (currentGame.in_checkmate()) {
+        setGameData(prev => ({
+          ...prev,
+          outcome: 'checkmate',
+          champion:
+            game.turnColor === 'white'
+              ? gameData.whitePlayerId
+              : gameData.blackPlayerId,
+        }));
+      }
+      return true;
+    }
   }
 
   return error ? (
