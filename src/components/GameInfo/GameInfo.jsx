@@ -5,7 +5,6 @@ function GameInfo({turnColor, opponentName, complete, draw, champion}){
         // draw = true
         // champion = 'Player 1'
     let gameState;
-    console.log(complete, draw, champion)
     if (complete){
         draw?
         gameState = 'Game complete: draw.'
