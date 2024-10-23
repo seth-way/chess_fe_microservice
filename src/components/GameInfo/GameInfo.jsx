@@ -14,8 +14,8 @@ function GameInfo({turnColor, opponentName, complete, draw, champion}){
     };
     return(
         <ul className="game-info">
-            <li>Game with: {opponentName}</li>
-            <li>{gameState}</li>
+            <li className='opponent-info'>Game with: {opponentName}</li>
+            <li className='turn-info'>{gameState}</li>
         </ul>
     );
 };
