@@ -5,6 +5,7 @@ import { Chessboard } from 'react-chessboard';
 import ChessSocket from '../../lib/ChessSocket';
 import Loading from '../Loading/Loading';
 import LoadError from '../LoadError/LoadError';
+import GameInfo from '../GameInfo/GameInfo';
 
 const defaultGameData = {
   playerColor: 'white',
@@ -25,7 +26,8 @@ const Game = ({ gameId, playerId }) => {
   const [socket, setSocket] = useState(null);
   const [error, setError] = useState(null);
   const [playerColor, setPlayerColor] = useState("white")
-
+  const [opponentName, setOpponentName] = useState("Unknown-Player")
+  
   useEffect(() => {
     if (gameId) {
       const chessSocket = new ChessSocket(gameId);
@@ -116,6 +118,14 @@ const Game = ({ gameId, playerId }) => {
   return error ? (
     <LoadError />
   ) : game ? (
+    <>
+    <GameInfo 
+      turnColor = {gameData.turnColor} 
+      opponentName = {opponentName} 
+      complete ={gameData.complete}
+      draw = {gameData.draw}
+      champion = {gameData.champion}
+    />
     <Chessboard
       position={game.fen()}Í
       onPieceDrop={onDrop}
@@ -127,6 +137,7 @@ const Game = ({ gameId, playerId }) => {
         backgroundColor: '#CEE1F2',
       }}
     />
+    </>
   ) : (
     <Loading />
   );
