@@ -51,6 +51,7 @@ const Game = ({ gameId, playerId }) => {
           currentFen: latest.current_fen,
           previousFen: latest.previous_fen,
           turnColor: latest.turn_color,
+          turnNumber: latest.turn_number,
           whitePlayerId: latest.white_player_id,
           blackPlayerId: latest.black_player_id,
           playerColor: playerId === latest.white_player_id ? 'white' : 'black',
