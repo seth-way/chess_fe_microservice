@@ -1,8 +1,8 @@
-function GameInfo({}){
+function GameInfo({turnColor}){
 
     return(
         <>
-        <div>GameInfo</div>
+        <div>{turnColor}</div>
         </>
     );
 };
