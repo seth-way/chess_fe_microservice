@@ -125,6 +125,7 @@ const Game = ({ gameId, playerId }) => {
       complete ={gameData.complete}
       draw = {gameData.draw}
       champion = {gameData.champion}
+      turnNumber = {gameData.turnNumber}
     />
     <Chessboard
       position={game.fen()}Í
