@@ -10,7 +10,7 @@ export default function ChessSocket(gameId) {
       gameId,
     },
   });
-  
+
   socket.connect();
 
   socket.makeMove = (fen, id) => {
