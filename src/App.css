@@ -4,11 +4,9 @@
   padding: 2rem;
 }
 
-.game-area {
-  min-height: 500px;
-  min-width: 500px;
+.game-area {
+  min-height: 365px;
+  min-width: 100%;
   display: flex;
   align-items: center;
-  justify-content: center;
 }
-
