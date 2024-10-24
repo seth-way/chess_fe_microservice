@@ -164,7 +164,7 @@ const Game = ({ gameId, playerId }) => {
         backgroundColor: '#4E98D9',
       }}
       customLightSquareStyle={{
-        backgroundColor: '#CEE1F2',
+        backgroundColor: '#F2F2F2',
       }}
     />
     </div>
