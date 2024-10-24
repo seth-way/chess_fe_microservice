@@ -1,12 +1,12 @@
 import './GameInfo.css'
-function GameInfo({turnColor, opponentName, complete, draw, champion, turnNumber}){
+function GameInfo({turnColor, opponentName, outcome, champion, turnNumber}){
     //uncomment below to manually test gameStates other than turn color.
         // complete = true
         // draw = true
         // champion = 'Player 1'
     let gameState;
-    if (complete){
-        draw?
+    if (outcome){
+        outcome === 'draw'?
         gameState = 'Game complete: draw.'
         :gameState = `Game complete: ${champion} won.`;
     } else {

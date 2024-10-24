@@ -61,14 +61,14 @@ const Game = ({ gameId, playerId }) => {
           }));
           if(gameData.playerColor === 'white'){
             if(latest.black_player_user_name){
-              setOpponentName(latest.black_player_user_name)
-            }
+              setOpponentName(latest.black_player_user_name);
+            };
           } else {
             if (latest.white_player_user_name){
-              setOpponentName(latest.white_player_user_name)
-            }
-          }
-        }
+              setOpponentName(latest.white_player_user_name);
+            };
+          };
+        };
       });
 
       setSocket(chessSocket);
@@ -152,7 +152,7 @@ const Game = ({ gameId, playerId }) => {
       turnColor = {gameData.turnColor} 
       opponentName = {opponentName} 
       complete ={gameData.complete}
-      draw = {gameData.draw}
+      outcome = {gameData.outcome}
       champion = {gameData.champion}
       turnNumber = {gameData.turnNumber}
     />
