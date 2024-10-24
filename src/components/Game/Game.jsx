@@ -43,6 +43,7 @@ const Game = ({ gameId, playerId }) => {
           latest.current_fen !== gameData.currentFen &&
           !gameData.resultsReceived
         ) {
+          console.log('username',latest.white_player_user_name)
           const latestGame = new Chess(latest.current_fen);
           setGame(() => latestGame);
           setGameData(prev => ({
@@ -58,7 +59,16 @@ const Game = ({ gameId, playerId }) => {
             champion: latest.game_champion,
             resultsReceived: latest.game_complete,
           }));
-        }
+          if(gameData.playerColor === 'white'){
+            if(latest.black_player_user_name){
+              setOpponentName(latest.black_player_user_name);
+            };
+          } else {
+            if (latest.white_player_user_name){
+              setOpponentName(latest.white_player_user_name);
+            };
+          };
+        };
       });
 
       setSocket(chessSocket);
@@ -142,7 +152,7 @@ const Game = ({ gameId, playerId }) => {
       turnColor = {gameData.turnColor} 
       opponentName = {opponentName} 
       complete ={gameData.complete}
-      draw = {gameData.draw}
+      outcome = {gameData.outcome}
       champion = {gameData.champion}
       turnNumber = {gameData.turnNumber}
     />
@@ -154,7 +164,7 @@ const Game = ({ gameId, playerId }) => {
         backgroundColor: '#4E98D9',
       }}
       customLightSquareStyle={{
-        backgroundColor: '#CEE1F2',
+        backgroundColor: '#F2F2F2',
       }}
     />
     </div>

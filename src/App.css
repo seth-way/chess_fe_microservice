@@ -2,7 +2,6 @@
   max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
-  text-align: center;
 }
 
 .game-area {
@@ -13,15 +12,3 @@
   justify-content: center;
 }
 
-.buttons {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  margin-top: 1rem;
-
-  .active {
-    color: yellow;
-  }
-}
