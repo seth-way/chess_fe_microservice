@@ -5,10 +5,13 @@
     text-align: left;
 }
 
-h2 {
-    margin-bottom: 0cm;
+.opponent-info {
+    /* margin-bottom: 0cm; */
+    font-family: "Roboto", sans-serif;
     
 }
-h3{
-    margin-top: 0cm;
+.turn-info {
+    font-family: "Roboto", sans-serif;
+    margin-bottom: 4ch;
 }
+
