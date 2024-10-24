@@ -5,29 +5,29 @@ import Game from './components/Game/Game';
 const games = [1, 2, 3, 4, 5];
 
 function App() {
+  console.log('<><> APP LOADED <><>');
   const [gameId, setGameId] = useState(1);
   const [playerId, setPlayerId] = useState(1);
 
   const handleClick = e => {
     if (e.target.value === 'player') {
-      setPlayerId(e.target.id);
-      console.log(playerId)
+      setPlayerId(Number(e.target.id));
     } else {
-      setGameId(e.target.id);
+      setGameId(Number(e.target.id));
     }
   };
 
   return (
     <>
       <div className='game-area'>
-        <Game gameId={gameId} playerId={Number(playerId.toString())} />
+        <Game gameId={gameId} playerId={playerId} />
       </div>
       <div className='buttons'>
         <button
           onClick={handleClick}
           id={1}
           value='player'
-          className={playerId === 1 ? 'active' : ''}
+          className={playerId === 5 ? 'active' : ''}
         >
           White
         </button>
@@ -35,7 +35,7 @@ function App() {
           onClick={handleClick}
           id={2}
           value='player'
-          className={playerId === 2 ? 'active' : ''}
+          className={playerId === 6 ? 'active' : ''}
         >
           Black
         </button>
