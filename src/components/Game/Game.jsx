@@ -43,7 +43,6 @@ const Game = ({ gameId, playerId }) => {
           latest.current_fen !== gameData.currentFen &&
           !gameData.resultsReceived
         ) {
-          console.log('username',latest.white_player_user_name)
           const latestGame = new Chess(latest.current_fen);
           setGame(() => latestGame);
           setGameData(prev => ({
@@ -60,7 +59,7 @@ const Game = ({ gameId, playerId }) => {
             champion: latest.game_champion,
             resultsReceived: latest.game_complete,
           }));
-          if(gameData.playerColor === 'white'){
+          if(playerId === latest.white_player_id){
             if(latest.black_player_user_name){
               setOpponentName(latest.black_player_user_name);
             };
