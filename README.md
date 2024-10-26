@@ -11,6 +11,11 @@ This is a websocket chess game microservice that serves a chess game to a front 
 - To run this app locally use `npm run dev` and navigate to the port vite runs the app on in your browser.
 - If the backend server is down, you can install it and run it locally as well: https://github.com/frien-emies/chess-game-be and change the indicated lines in ChessSocket.js to point the application to the new endpoint.
 
+### Testing Instructions:
+To test the component, simply run the following command after installing the app's dependencies:
+
+```npm run cy:open```
+
 ### Preview of App:
 [//]: <> (Provide ONE gif or screenshot of your application - choose the "coolest" piece of functionality to show off.)
 ![app preview](https://i.imgur.com/NawOs9w.png)
