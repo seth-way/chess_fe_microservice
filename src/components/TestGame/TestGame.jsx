@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Chess } from 'chess.js';
 import { Chessboard } from 'react-chessboard';
 
-const TestGame = ({ fen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'}) => {
+const TestGame = ({ fen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', testMode = false}) => {
   const [game, setGame] = useState(new Chess(fen));
   const [sourceSquare, setSourceSquare] = useState(null);
 
@@ -15,18 +15,24 @@ const TestGame = ({ fen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 
   }
 
   function makeRandomMove() {
+    if (testMode) {
+      const controlledMoves = ['e7e5', 'd7d6'];
+      const move = makeAMove({ from: controlledMoves[0].slice(0, 2), to: controlledMoves[0].slice(2) });
+      controlledMoves.shift();
+      return move;
+    }
+  
     const possibleMoves = game.moves();
-    if (game.game_over() || game.in_draw() || possibleMoves.length === 0)
-      return;
-    const randomIndex = Math.floor(Math.random() * possibleMoves.length);
-    makeAMove(possibleMoves[randomIndex]);
+    if (game.game_over() || game.in_draw() || possibleMoves.length === 0) return;
+    const randomGameIndex = Math.floor(Math.random() * possibleMoves.length);
+    makeAMove(possibleMoves[randomGameIndex]);
   }
 
   function onDrop(sourceSquare, targetSquare) {
     const move = makeAMove({
       from: sourceSquare,
       to: targetSquare,
-      promotion: 'q', // always promote to a queen for example simplicity
+      promotion: 'q',
     });
 
     // illegal move
@@ -44,10 +50,9 @@ const TestGame = ({ fen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 
     const move = makeAMove({
       from: sourceSquare,
       to: square,
-      promotion: 'q', // always promote to a queen for example simplicity
+      promotion: 'q',
     });
 
-    // illegal move
     if (move === null) return false;
     console.log(game.fen());
     setTimeout(makeRandomMove, 200);

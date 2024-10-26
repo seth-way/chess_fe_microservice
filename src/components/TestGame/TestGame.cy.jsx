@@ -1,11 +1,7 @@
 import TestGame from './TestGame';
 import '@4tw/cypress-drag-drop';
-// import { mount } from '@cypress/react18';
 
 describe('<App /> Component', () => {
-  // beforeEach(() => {
-  // cy.mount(<TestGame />);
-  // });
   it('renders the chessboard correctly', () => {
     cy.mount(<TestGame />);
     cy.get('.game-area').should('exist');
@@ -19,13 +15,34 @@ describe('<App /> Component', () => {
   it('allows the user to make a legal move', () => {
     cy.mount(<TestGame />);
     cy.get('[data-square="g2"] [data-piece="wP"]')
-      .click()
+      .click();
     cy.get('[data-square="g3"]')
-      .click()
+      .click();
     cy.get('[data-square="g2"] [data-piece="wP"]')
-      .should('not.exist')
+      .should('not.exist');
     cy.get('[data-square="g3"] [data-piece="wP"]')
-      .should('exist')
+      .should('exist');
+  });
+  it('prevents the user from making an illegal move', () => {
+    cy.mount(<TestGame />);
+    cy.get('[data-square="e2"] [data-piece="wP"]')
+      .click();
+    cy.get('[data-square="e5"]')
+      .click();
+    cy.get('[data-square="e2"] [data-piece="wP"]')
+      .should('exist');
+    cy.get('[data-square="e5"] [data-piece="wP"]')
+      .should('not.exist');
+  });
+  it('allows the user to capture an enemy piece', () => {
+    cy.mount(<TestGame fen="rnbqkbnr/pppppppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1" testMode={true} />);
+    cy.get('[data-square="e4"] [data-piece="wP"]')
+      .click();
+    cy.get('[data-square="d5"]')
+      .click();
+
+
+    
   });
 });
 
