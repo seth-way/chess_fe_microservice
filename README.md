@@ -18,7 +18,7 @@ To test the component, simply run the following command after installing the app
 
 ### Preview of App:
 [//]: <> (Provide ONE gif or screenshot of your application - choose the "coolest" piece of functionality to show off.)
-![app preview](https://i.imgur.com/NawOs9w.png)
+![app preview](/chess-demo.gif)
 ### Context:
 [//]: <> (Give some context for the project here. How long did you have to work on it? How far into the Turing program are you?)
 This project was created as a part of capstone project for the front end development course at Turing School Of Software And Design.
