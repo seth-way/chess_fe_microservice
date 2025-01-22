@@ -25,7 +25,7 @@ This project was created as a part of capstone project for the front end develop
 
 ### Contributors:
 [//]: <> (Who worked on this application? Link to their GitHubs.)
-Gwyneth Patrick: https://github.com/moth-dust.
+Liam Patrick: https://github.com/moth-dust.
 
 Seth Way: https://github.com/seth-way.
 
